@@ -1,5 +1,7 @@
-package com.example.chatapp.feature.auth.signin
+package com.example.chatapp.feature.auth.signup
 
+import com.example.chatapp.feature.auth.signin.SignInState
+import com.example.chatapp.feature.auth.signin.SignInViewModel
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -34,26 +36,33 @@ import androidx.navigation.NavController
 import com.example.chatapp.R
 
 @Composable
-fun SignInScreen(navController: NavController){
-    val viewModel: SignInViewModel = hiltViewModel()
+fun SignUpScreen(navController: NavController){
+    val viewModel: SignUpViewModel = hiltViewModel()
     val uiState = viewModel.state.collectAsState()
 
+    var  name by remember{
+        mutableStateOf("")
+    }
     var  email by remember{
         mutableStateOf("")
     }
     var  password by remember{
         mutableStateOf("")
     }
+    var  comfirm by remember{
+        mutableStateOf("")
+    }
 
     val context = LocalContext.current
     LaunchedEffect (key1 = uiState.value){
         when(uiState.value){
-            is SignInState.Success ->{
+            is SignUpState.Success ->{
                 navController.navigate("home"){
                     popUpTo("login"){ inclusive = true}
+                    popUpTo("signup"){ inclusive = true}
                 }
             }
-            is SignInState.Error ->{
+            is SignUpState.Error ->{
                 Toast.makeText(context, "Sign In Failed", Toast.LENGTH_SHORT).show()
             }
             else -> {}
@@ -74,6 +83,14 @@ fun SignInScreen(navController: NavController){
             Spacer(modifier = Modifier.size(32.dp))
 
             OutlinedTextField(
+                value = name,
+                onValueChange = {name = it},
+                modifier = Modifier.fillMaxWidth(),
+                label = {Text(text = "Name")}
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+
+            OutlinedTextField(
                 value = email,
                 onValueChange = {email = it},
                 modifier = Modifier.fillMaxWidth(),
@@ -89,20 +106,31 @@ fun SignInScreen(navController: NavController){
                 label = {Text(text = "password")},
                 visualTransformation = PasswordVisualTransformation()
             )
+            Spacer(modifier = Modifier.size(8.dp))
+
+            OutlinedTextField(
+                value = comfirm,
+                onValueChange = { comfirm = it},
+                modifier = Modifier.fillMaxWidth(),
+                label = {Text(text = "Comfirm Password")},
+                visualTransformation = PasswordVisualTransformation(),
+                isError = password.isNotEmpty() && comfirm.isNotEmpty() && comfirm != password
+            )
 
             Spacer(modifier = Modifier.size(16.dp))
-            if(uiState.value == SignInState.Loading){
+            if(uiState.value == SignUpState.Loading){
                 CircularProgressIndicator()
             }else {
                 Button(
-                    onClick = { viewModel.signIn(email, password)},
-                    modifier = Modifier.fillMaxWidth()
+                    onClick = { viewModel.signUp(name, email, password)},
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && comfirm.isNotEmpty() && password == comfirm
                 ) {
-                    Text(text = stringResource(id = R.string.signin))
+                    Text(text = stringResource(id = R.string.signup))
                 }
 
-                TextButton(onClick = {navController.navigate("signup")}) {
-                    Text(text = stringResource(id = R.string.signintext))
+                TextButton(onClick = {}) {
+                    Text(text = stringResource(id = R.string.signuptext))
                 }
             }
         }
