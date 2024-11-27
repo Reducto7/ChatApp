@@ -19,9 +19,9 @@ fun MainApp(){
             composable("login"){
                 SignInScreen(navController = navController)
             }
-            composable("signup"){
-
-            }
+    //        composable("signup"){
+//
+    //        }
         }
     }
 }
